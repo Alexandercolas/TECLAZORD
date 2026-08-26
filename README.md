@@ -43,6 +43,21 @@ mezclados que se reciclan si terminas antes de tiempo), `S` Supervivencia
 Configuracion (sonido on/off, volumen, cambiar tu nombre para el
 leaderboard).
 
+## Compartirlo con otros (ejecutable de Windows)
+
+Para que alguien lo juegue sin instalar Python ni nada:
+
+```bash
+tools\build_exe.bat
+```
+
+Genera `dist\TeclazoRD\TeclazoRD.exe`. **Comprime toda la carpeta**
+`dist\TeclazoRD` (no solo el .exe) y comparte el .zip — el ejecutable
+necesita los archivos de al lado (assets de sonido, dependencias de
+Python empaquetadas) para funcionar. Cada persona que lo use genera su
+propia carpeta `data/` junto al .exe con su progreso, nombre y
+estadisticas; no se comparte entre instalaciones.
+
 ## Ejecutar las pruebas
 
 ```bash
