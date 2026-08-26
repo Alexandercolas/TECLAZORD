@@ -6,7 +6,7 @@ Videojuego local de entrenamiento de mecanografia, 100% offline (sin
 internet, servidores ni cuentas). Ver `TECLAZO_RD_Documento_Maestro.docx`
 para el diseño completo.
 
-Estado actual: **Niveles 1-10 jugables** (los 10 niveles principales), con seleccion de nivel, desbloqueo progresivo, teclado visual, estadisticas, XP, logros, entrenamiento personalizado, sonido, efectos y pantalla de configuracion (Fase 1-6 completa segun el alcance definido; temas visuales alternativos quedan fuera de alcance por ahora).
+Estado actual: **Niveles 1-10 jugables** mas **10 modos de juego adicionales** (Practica libre, Modo Errores, Modo Examen, Modo Numpad, Modo Versus, Contrarreloj, Supervivencia, Leaderboard, Estadisticas, Logros), con desbloqueo progresivo, teclado visual, XP, sonido, efectos y configuracion (Fases 1-6 del documento maestro completas, mas la seccion 16 de modos de juego y la seccion 27 de expansiones).
 
 ## Requisitos
 
@@ -35,8 +35,13 @@ Leaderboard local (mejor WPM por nombre), `X` Modo Examen (un texto largo
 y continuo de 60s, con certificado al final), `N` Modo Numpad dedicado
 (solo cuentan las teclas fisicas del teclado numerico, no la fila
 superior), `V` Modo Versus (duelo local por turnos: cada jugador escribe
-el mismo texto por separado y se compara el resultado), `C` Configuracion
-(sonido on/off, volumen, cambiar tu nombre para el leaderboard).
+el mismo texto por separado y se compara el resultado), `F` Practica
+libre (elige categoria: letras, numeros, simbolos, numpad, codigo u
+oficina), `T` Contrarreloj (maxima velocidad en 30/60/120s, ejercicios
+mezclados que se reciclan si terminas antes de tiempo), `S` Supervivencia
+(el texto no para; si tu precision cae de 80% es GAME OVER), `C`
+Configuracion (sonido on/off, volumen, cambiar tu nombre para el
+leaderboard).
 
 ## Ejecutar las pruebas
 
@@ -77,4 +82,5 @@ python tools/generate_sounds.py
 - [x] Expansion (seccion 27): Leaderboard local por nombre (mejor WPM), Modo Examen (prueba unica de 60s con certificado)
 - [x] Modo Numpad dedicado (seccion 17): detecta teclas fisicas del Numpad (K_KP_*) via core/keymap.py, penaliza usar la fila superior
 - [x] Modo Versus - 2 jugadores en un solo teclado (seccion 27): duelo por turnos (no simultaneo), mismo texto para ambos, pantalla de resultado con ganador, alimenta el leaderboard local
+- [x] Modos de juego completos (seccion 16): Practica libre (6 categorias, reutiliza contenido de niveles), Contrarreloj (30/60/120s, ejercicios mezclados que se reciclan), Supervivencia (sin limite de tiempo fijo, termina en GAME OVER si la precision cae de 80%)
 - [ ] Fuera de alcance por ahora: temas visuales alternativos (el usuario confirmo que el esquema amarillo/negro actual esta bien)

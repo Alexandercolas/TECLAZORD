@@ -12,16 +12,25 @@ from core.timer import GameTimer
 from levels import registry
 from systems.achievements import Achievements, check_level_result_achievements
 from systems.exam import ExamLevel, get_exercises as get_exam_exercises
+from systems.free_practice import CATEGORIES as FREE_PRACTICE_CATEGORIES
+from systems.free_practice import FreePracticeLevel, get_exercises as get_free_practice_exercises
 from systems.game_settings import GameSettings
 from systems.key_stats import KeyStats
 from systems.leaderboard import Leaderboard
 from systems.numpad_training import NumpadLevel, get_exercises as get_numpad_exercises
 from systems.statistics import Statistics
+from systems.survival import (
+    SURVIVAL_GRACE_CHARACTERS, SURVIVAL_MIN_PRECISION_PERCENT, SurvivalLevel,
+    get_exercises as get_survival_exercises,
+)
+from systems.time_attack import DURATIONS as TIME_ATTACK_DURATIONS
+from systems.time_attack import TimeAttackLevel, get_exercises as get_time_attack_exercises
 from systems.training import TrainingLevel, generate_personalized_exercises
 from systems.versus import VersusLevel, get_exercises as get_versus_exercises
 from ui import (
-    achievements_screen, exam_result_screen, game_screen, leaderboard_screen, level_select, menu,
-    message_screen, name_entry_screen, results_screen, settings_screen, statistics_screen,
+    achievements_screen, exam_result_screen, free_practice_select_screen, game_screen,
+    leaderboard_screen, level_select, menu, message_screen, name_entry_screen, results_screen,
+    settings_screen, statistics_screen, survival_result_screen, time_attack_select_screen,
     versus_result_screen,
 )
 
@@ -37,6 +46,8 @@ SCENE_LEADERBOARD = "leaderboard"
 SCENE_NAME_ENTRY = "name_entry"
 SCENE_VERSUS_NAME = "versus_name"
 SCENE_VERSUS_RESULT = "versus_result"
+SCENE_FREE_PRACTICE_SELECT = "free_practice_select"
+SCENE_TIME_ATTACK_SELECT = "time_attack_select"
 
 MAX_NAME_LENGTH = 20
 
@@ -82,6 +93,8 @@ class Game:
         self.message_body = ""
         self.name_entry_buffer = ""
         self.versus_state = None
+        self.free_practice_index = 0
+        self.time_attack_index = 1
 
     def run(self):
         while self.running:
@@ -123,6 +136,10 @@ class Game:
                 self._handle_versus_name_event(event)
             elif self.scene == SCENE_VERSUS_RESULT:
                 self._handle_versus_result_event(event)
+            elif self.scene == SCENE_FREE_PRACTICE_SELECT:
+                self._handle_free_practice_select_event(event)
+            elif self.scene == SCENE_TIME_ATTACK_SELECT:
+                self._handle_time_attack_select_event(event)
 
     def _handle_menu_event(self, event):
         if event.type != pygame.KEYDOWN:
@@ -145,6 +162,12 @@ class Game:
             self._start_numpad_mode()
         elif event.key == pygame.K_v:
             self._start_versus_mode()
+        elif event.key == pygame.K_f:
+            self._change_scene(SCENE_FREE_PRACTICE_SELECT)
+        elif event.key == pygame.K_t:
+            self._change_scene(SCENE_TIME_ATTACK_SELECT)
+        elif event.key == pygame.K_s:
+            self._start_survival_mode()
         elif event.key == pygame.K_ESCAPE:
             self.running = False
 
@@ -261,6 +284,118 @@ class Game:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             self._change_scene(SCENE_MENU)
 
+    def _handle_free_practice_select_event(self, event):
+        if event.type != pygame.KEYDOWN:
+            return
+
+        if event.key == pygame.K_UP:
+            self.free_practice_index = (self.free_practice_index - 1) % len(FREE_PRACTICE_CATEGORIES)
+            self.sound.play("menu_move")
+        elif event.key == pygame.K_DOWN:
+            self.free_practice_index = (self.free_practice_index + 1) % len(FREE_PRACTICE_CATEGORIES)
+            self.sound.play("menu_move")
+        elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+            category = FREE_PRACTICE_CATEGORIES[self.free_practice_index]
+            if category == "numpad":
+                # El teclado numerico dedicado ya tiene su propio modo con
+                # la deteccion de tecla fisica; se reutiliza en vez de duplicarlo.
+                self._start_numpad_mode()
+            else:
+                self._start_free_practice(category)
+        elif event.key == pygame.K_ESCAPE:
+            self._change_scene(SCENE_MENU)
+
+    def _start_free_practice(self, category):
+        exercises = get_free_practice_exercises(category)
+        FreePracticeLevel.NAME = f"PRACTICA LIBRE - {category.upper()}"
+
+        self.level_session = {
+            "level_number": None,
+            "level_module": FreePracticeLevel,
+            "exercises": exercises,
+            "exercise_index": 0,
+            "input_manager": InputManager(exercises[0]),
+            "completed_managers": [],
+            "timer": GameTimer(FreePracticeLevel.TIME_LIMIT_SECONDS),
+            "is_training": True,
+            "is_exam": False,
+            "is_numpad_mode": False,
+            "is_versus": False,
+        }
+        self.level_session["timer"].start()
+        self._change_scene(SCENE_LEVEL)
+
+    def _handle_time_attack_select_event(self, event):
+        if event.type != pygame.KEYDOWN:
+            return
+
+        if event.key == pygame.K_UP:
+            self.time_attack_index = (self.time_attack_index - 1) % len(TIME_ATTACK_DURATIONS)
+            self.sound.play("menu_move")
+        elif event.key == pygame.K_DOWN:
+            self.time_attack_index = (self.time_attack_index + 1) % len(TIME_ATTACK_DURATIONS)
+            self.sound.play("menu_move")
+        elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+            self._start_time_attack(TIME_ATTACK_DURATIONS[self.time_attack_index])
+        elif event.key == pygame.K_ESCAPE:
+            self._change_scene(SCENE_MENU)
+
+    def _start_time_attack(self, duration_seconds):
+        exercises = get_time_attack_exercises()
+        TimeAttackLevel.NAME = f"CONTRARRELOJ {duration_seconds}s"
+        TimeAttackLevel.TIME_LIMIT_SECONDS = duration_seconds
+
+        self.level_session = {
+            "level_number": None,
+            "level_module": TimeAttackLevel,
+            "exercises": exercises,
+            "exercise_index": 0,
+            "input_manager": InputManager(exercises[0]),
+            "completed_managers": [],
+            "timer": GameTimer(duration_seconds),
+            "is_training": False,
+            "is_exam": False,
+            "is_numpad_mode": False,
+            "is_versus": False,
+            "is_time_attack": True,
+            # Con ejercicios cortos y hasta 120s de duracion, el jugador
+            # puede agotar la lista antes de que se acabe el tiempo: se
+            # reinicia en bucle en vez de terminar la ronda antes de tiempo.
+            "cycle_exercises": True,
+        }
+        self.level_session["timer"].start()
+        self._change_scene(SCENE_LEVEL)
+
+    def _start_survival_mode(self):
+        exercises = get_survival_exercises()
+        self.level_session = {
+            "level_number": None,
+            "level_module": SurvivalLevel,
+            "exercises": exercises,
+            "exercise_index": 0,
+            "input_manager": InputManager(exercises[0]),
+            "completed_managers": [],
+            "timer": GameTimer(SurvivalLevel.TIME_LIMIT_SECONDS),
+            "is_training": False,
+            "is_exam": False,
+            "is_numpad_mode": False,
+            "is_versus": False,
+            "is_time_attack": False,
+            "is_survival": True,
+            "cycle_exercises": True,
+        }
+        self.level_session["timer"].start()
+        self._change_scene(SCENE_LEVEL)
+
+    def _survival_precision_too_low(self, session):
+        managers = session["completed_managers"] + [session["input_manager"]]
+        typed_count = sum(len(m.typed) for m in managers)
+        if typed_count < SURVIVAL_GRACE_CHARACTERS:
+            return False
+        correct_count = sum(m.correct_count for m in managers)
+        precision = scoring.calculate_precision(correct_count, typed_count)
+        return precision < SURVIVAL_MIN_PRECISION_PERCENT
+
     def _handle_level_select_event(self, event):
         if event.type != pygame.KEYDOWN:
             return
@@ -354,8 +489,14 @@ class Game:
         else:
             self._handle_generic_input(event, input_manager)
 
+        if session.get("is_survival", False) and self._survival_precision_too_low(session):
+            self._finish_level()
+            return
+
         if input_manager.is_complete():
             next_index = session["exercise_index"] + 1
+            if next_index >= len(session["exercises"]) and session.get("cycle_exercises", False):
+                next_index = 0
             if next_index < len(session["exercises"]):
                 # Un ejercicio a la vez (no todos pegados en un solo texto),
                 # para que quepa en pantalla incluso en niveles con muchas
@@ -429,8 +570,12 @@ class Game:
         is_exam = session.get("is_exam", False)
         is_numpad_mode = session.get("is_numpad_mode", False)
         is_versus = session.get("is_versus", False)
+        is_time_attack = session.get("is_time_attack", False)
+        is_survival = session.get("is_survival", False)
 
-        self.sound.play("level_complete" if passed else "level_failed")
+        # Supervivencia siempre termina en GAME OVER (por diseno, seccion
+        # 16): nunca es una "victoria", asi que suena como un fallo.
+        self.sound.play("level_failed" if (not passed or is_survival) else "level_complete")
 
         if is_versus:
             self._finish_versus_round(session, wpm, precision, error_count, max_combo, score)
@@ -449,6 +594,8 @@ class Game:
             "correct_chars": correct_count,
             "typed_chars": typed_count,
             "is_exam": is_exam,
+            "is_survival": is_survival,
+            "survival_time_seconds": elapsed,
         }
 
         if passed and not is_training and not is_numpad_mode:
@@ -460,7 +607,10 @@ class Game:
             )
             self.last_result["leaderboard_updated"] = leaderboard_updated
 
-        if passed and not is_training and not is_exam and not is_numpad_mode:
+        if (
+            passed and not is_training and not is_exam and not is_numpad_mode
+            and not is_time_attack and not is_survival
+        ):
             previous_record = self.progression.data["level_records"].get(str(session["level_number"]), {})
             is_new_record = score > previous_record.get("best_score", 0)
 
@@ -556,6 +706,8 @@ class Game:
         elif self.scene == SCENE_RESULTS:
             if self.last_result and self.last_result.get("is_exam"):
                 exam_result_screen.draw(self.screen, self.font_title, self.font_hud, self.last_result, self.player)
+            elif self.last_result and self.last_result.get("is_survival"):
+                survival_result_screen.draw(self.screen, self.font_title, self.font_hud, self.last_result)
             else:
                 results_screen.draw(self.screen, self.font_title, self.font_hud, self.last_result)
         elif self.scene == SCENE_STATISTICS:
@@ -585,6 +737,10 @@ class Game:
             )
         elif self.scene == SCENE_VERSUS_RESULT:
             versus_result_screen.draw(self.screen, self.font_title, self.font_hud, self.versus_state)
+        elif self.scene == SCENE_FREE_PRACTICE_SELECT:
+            free_practice_select_screen.draw(self.screen, self.font_title, self.font_hud, self.free_practice_index)
+        elif self.scene == SCENE_TIME_ATTACK_SELECT:
+            time_attack_select_screen.draw(self.screen, self.font_title, self.font_hud, self.time_attack_index)
 
         self._draw_effects()
         pygame.display.flip()
