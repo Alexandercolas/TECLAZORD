@@ -64,6 +64,12 @@ COMBO_POPUP_DURATION_SECONDS = 0.7
 TOP_ROW_DIGIT_KEYS = {getattr(pygame, f"K_{i}") for i in range(10)} | {pygame.K_PERIOD}
 
 
+def _shuffled(items):
+    """Copia mezclada de items, sin mutar la lista original (que puede ser
+    la misma que guarda el modulo del nivel/practica)."""
+    return random.sample(items, k=len(items))
+
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -262,7 +268,7 @@ class Game:
         self._change_scene(SCENE_LEVEL)
 
     def _start_numpad_mode(self):
-        exercises = get_numpad_exercises()
+        exercises = _shuffled(get_numpad_exercises())
         self.level_session = {
             "level_number": None,
             "level_module": NumpadLevel,
@@ -354,7 +360,7 @@ class Game:
             self._change_scene(SCENE_MENU)
 
     def _start_free_practice(self, category):
-        exercises = get_free_practice_exercises(category)
+        exercises = _shuffled(get_free_practice_exercises(category))
         FreePracticeLevel.NAME = f"PRACTICA LIBRE - {category.upper()}"
 
         self.level_session = {
