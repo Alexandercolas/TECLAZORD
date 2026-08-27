@@ -8,3 +8,4 @@ data/*.json
 build/
 dist/
 *.spec
+/TeclazoRD/

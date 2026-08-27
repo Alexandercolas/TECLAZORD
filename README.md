@@ -39,9 +39,10 @@ el mismo texto por separado y se compara el resultado), `F` Practica
 libre (elige categoria: letras, numeros, simbolos, numpad, codigo u
 oficina), `T` Contrarreloj (maxima velocidad en 30/60/120s, ejercicios
 mezclados que se reciclan si terminas antes de tiempo), `S` Supervivencia
-(el texto no para; si tu precision cae de 80% es GAME OVER), `C`
-Configuracion (sonido on/off, volumen, cambiar tu nombre para el
-leaderboard).
+(el texto no para; si tu precision cae de 80% es GAME OVER), `A` Modo
+Aleatorio (elige al azar entre un nivel desbloqueado o cualquier modo
+especial), `C` Configuracion (sonido on/off, volumen, cambiar tu nombre
+para el leaderboard).
 
 ## Compartirlo con otros (ejecutable de Windows)
 
@@ -98,4 +99,5 @@ python tools/generate_sounds.py
 - [x] Modo Numpad dedicado (seccion 17): detecta teclas fisicas del Numpad (K_KP_*) via core/keymap.py, penaliza usar la fila superior
 - [x] Modo Versus - 2 jugadores en un solo teclado (seccion 27): duelo por turnos (no simultaneo), mismo texto para ambos, pantalla de resultado con ganador, alimenta el leaderboard local
 - [x] Modos de juego completos (seccion 16): Practica libre (6 categorias, reutiliza contenido de niveles), Contrarreloj (30/60/120s, ejercicios mezclados que se reciclan), Supervivencia (sin limite de tiempo fijo, termina en GAME OVER si la precision cae de 80%)
-- [ ] Fuera de alcance por ahora: temas visuales alternativos (el usuario confirmo que el esquema amarillo/negro actual esta bien)
+- [x] Modo Aleatorio: elige al azar entre un nivel desbloqueado o cualquier modo especial (reutiliza los metodos existentes, sin logica nueva)
+- [ ] Fuera de alcance por ahora: temas visuales alternativos (el usuario confirmo que el esquema amarillo/negro actual esta bien), Modo oficina y Modo programacion multi-lenguaje como modos separados (ya cubiertos por las categorias existentes de Practica Libre y por el Nivel 8/5/7, pero sin JavaScript/SQL/HTML como pide la seccion 27)

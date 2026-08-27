@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 from config import settings
@@ -168,8 +170,54 @@ class Game:
             self._change_scene(SCENE_TIME_ATTACK_SELECT)
         elif event.key == pygame.K_s:
             self._start_survival_mode()
+        elif event.key == pygame.K_a:
+            self._start_random_mode()
         elif event.key == pygame.K_ESCAPE:
             self.running = False
+
+    def _start_random_mode(self):
+        """Elige al azar entre todo lo que existe: los 10 niveles
+        desbloqueados y todos los modos especiales (menos Versus, que
+        necesita nombres de 2 jugadores primero). Reutiliza los metodos
+        _start_* existentes, no duplica logica de ninguno."""
+        choices = []
+
+        unlocked_levels = [n for n in registry.get_all_numbers() if self.progression.is_unlocked(n)]
+        if unlocked_levels:
+            choices.append(("level", random.choice(unlocked_levels)))
+
+        for category in FREE_PRACTICE_CATEGORIES:
+            choices.append(("free_practice", category))
+
+        for duration in TIME_ATTACK_DURATIONS:
+            choices.append(("time_attack", duration))
+
+        choices.append(("exam", None))
+        choices.append(("survival", None))
+        choices.append(("numpad", None))
+
+        if generate_personalized_exercises(self.key_stats):
+            choices.append(("training", None))
+
+        kind, value = random.choice(choices)
+
+        if kind == "level":
+            self._start_level(value)
+        elif kind == "free_practice":
+            if value == "numpad":
+                self._start_numpad_mode()
+            else:
+                self._start_free_practice(value)
+        elif kind == "time_attack":
+            self._start_time_attack(value)
+        elif kind == "exam":
+            self._start_exam_mode()
+        elif kind == "survival":
+            self._start_survival_mode()
+        elif kind == "numpad":
+            self._start_numpad_mode()
+        elif kind == "training":
+            self._start_training_mode()
 
     def _start_training_mode(self):
         exercises = generate_personalized_exercises(self.key_stats)

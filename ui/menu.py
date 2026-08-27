@@ -8,7 +8,7 @@ def draw(screen, font_title, font_hud):
     screen.blit(title_surf, title_surf.get_rect(center=(width // 2, height // 3)))
 
     hint_lines = [
-        "ENTER elegir nivel  -  E estadisticas  -  L logros  -  R leaderboard",
+        "ENTER elegir nivel  -  E estadisticas  -  L logros  -  R leaderboard  -  A aleatorio",
         "F practica libre  -  P modo errores  -  X modo examen  -  T contrarreloj",
         "N modo numpad  -  V modo versus  -  S supervivencia  -  C configuracion  -  ESC salir",
     ]
