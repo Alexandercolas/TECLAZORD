@@ -50,3 +50,22 @@ def test_ignores_input_past_target_length():
     im.handle_text_input("x")
     assert im.typed == "f"
     assert im.error_count == 0
+
+
+def test_force_miss_counts_untyped_characters_as_errors():
+    im = InputManager("hello")
+    im.handle_text_input("h")
+    im.handle_text_input("e")
+    im.force_miss()
+    assert im.is_complete()
+    assert im.error_count == 3  # l, l, o quedaron sin escribir
+    assert im.character_errors == {"l": 2, "o": 1}
+    assert im.combo == 0
+
+
+def test_force_miss_on_untouched_phrase_marks_every_character_as_error():
+    im = InputManager("ab")
+    im.force_miss()
+    assert im.is_complete()
+    assert im.error_count == 2
+    assert im.character_errors == {"a": 1, "b": 1}

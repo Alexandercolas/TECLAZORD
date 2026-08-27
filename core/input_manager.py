@@ -43,3 +43,14 @@ class InputManager:
 
     def is_complete(self):
         return len(self.typed) >= len(self.target_text)
+
+    def force_miss(self):
+        """La frase llego al fondo sin completarse (Niveles 11+, frases que
+        caen): cada caracter que faltaba cuenta como error, y se marca
+        completa para que la sesion pase a la siguiente."""
+        for i in range(len(self.typed), len(self.target_text)):
+            expected = self.target_text[i]
+            self.error_count += 1
+            self.character_errors[expected] = self.character_errors.get(expected, 0) + 1
+        self.combo = 0
+        self.typed = self.target_text

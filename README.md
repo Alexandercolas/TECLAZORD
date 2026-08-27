@@ -6,7 +6,14 @@ Videojuego local de entrenamiento de mecanografia, 100% offline (sin
 internet, servidores ni cuentas). Ver `TECLAZO_RD_Documento_Maestro.docx`
 para el diseño completo.
 
-Estado actual: **Niveles 1-10 jugables** mas **10 modos de juego adicionales** (Practica libre, Modo Errores, Modo Examen, Modo Numpad, Modo Versus, Contrarreloj, Supervivencia, Leaderboard, Estadisticas, Logros), con desbloqueo progresivo, teclado visual, XP, sonido, efectos y configuracion (Fases 1-6 del documento maestro completas, mas la seccion 16 de modos de juego y la seccion 27 de expansiones).
+Estado actual: **Niveles 1-20 jugables** (los 10 del documento maestro
+mas 10 adicionales de una extension personalizada de ingenieria en
+sistemas en ingles, seccion propia mas abajo) mas **10 modos de juego
+adicionales** (Practica libre, Modo Errores, Modo Examen, Modo Numpad,
+Modo Versus, Contrarreloj, Supervivencia, Leaderboard, Estadisticas,
+Logros), con desbloqueo progresivo, teclado visual, XP, sonido, efectos
+y configuracion (Fases 1-6 del documento maestro completas, mas la
+seccion 16 de modos de juego y la seccion 27 de expansiones).
 
 ## Requisitos
 
@@ -43,6 +50,38 @@ mezclados que se reciclan si terminas antes de tiempo), `S` Supervivencia
 Aleatorio (elige al azar entre un nivel desbloqueado o cualquier modo
 especial), `C` Configuracion (sonido on/off, volumen, cambiar tu nombre
 para el leaderboard).
+
+## Niveles 11-20: extension de ingenieria en sistemas (fuera del documento maestro)
+
+A pedido del usuario, mas alla de los 10 niveles originales. Cambia de
+formato: las frases **caen de arriba hacia abajo** en vez de quedarse
+quietas, y si una frase llega al piso sin completarse cuenta como error
+y pasa a la siguiente (el nivel sigue, no es GAME OVER instantaneo).
+Al completar una frase entera sin ningun error, suena un "chasquido"
+distinto del clic de cada tecla.
+
+- Contenido mayormente en ingles, tematica de informatica / ingenieria
+  en sistemas, con dificultad progresiva por nivel:
+
+  | Nivel | Tema |
+  |---|---|
+  | 11 | IT Basics (vocabulario suelto) |
+  | 12 | Networking |
+  | 13 | Programming Basics |
+  | 14 | Databases |
+  | 15 | Web Development |
+  | 16 | Cybersecurity |
+  | 17 | Operating Systems |
+  | 18 | Cloud and DevOps |
+  | 19 | Algorithms and Data Structures |
+  | 20 | Systems Engineer Final Challenge (oraciones completas, mezcla todo) |
+
+- La velocidad de caida es proporcional al largo de cada frase (no un
+  tiempo fijo), y se acelera progresivamente del Nivel 11 al 20.
+- Se desbloquean igual que los niveles 1-10 (puntuacion minima en el
+  nivel anterior).
+- Pendiente, si se pide despues: mas idiomas de codigo (JavaScript,
+  SQL, HTML) ademas de la sintaxis tipo Python ya usada en el Nivel 8.
 
 ## Compartirlo con otros (ejecutable de Windows)
 

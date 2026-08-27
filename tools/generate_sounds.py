@@ -133,6 +133,16 @@ def make_achievement_unlocked():
     return _concat(*[_tone(f, 0.07, volume=0.55, wave_shape="square", decay_rate=7) for f in notes])
 
 
+def make_phrase_complete():
+    # "Chasquido" al completar una frase entera sin errores (Niveles 11+,
+    # frases que caen): un golpe seco y brillante, distinto del clic corto
+    # por tecla individual.
+    snap = _tone(2000, 0.035, volume=0.55, wave_shape="square", decay_rate=20, attack_seconds=0.001)
+    noise = _noise(0.02, volume=0.3, decay_rate=25)
+    chime = _tone(1200, 0.09, volume=0.4, wave_shape="sine", decay_rate=8)
+    return _concat(_mix(snap, noise), chime)
+
+
 def main():
     print("Generando efectos de sonido en assets/sounds/ ...")
     _write_wav("type_correct.wav", make_type_correct())
@@ -142,6 +152,7 @@ def main():
     _write_wav("level_complete.wav", make_level_complete())
     _write_wav("level_failed.wav", make_level_failed())
     _write_wav("achievement_unlocked.wav", make_achievement_unlocked())
+    _write_wav("phrase_complete.wav", make_phrase_complete())
     print("Listo.")
 
 

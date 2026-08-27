@@ -45,4 +45,5 @@ SOUND_FILES = {
     "level_complete": "assets/sounds/level_complete.wav",
     "level_failed": "assets/sounds/level_failed.wav",
     "achievement_unlocked": "assets/sounds/achievement_unlocked.wav",
+    "phrase_complete": "assets/sounds/phrase_complete.wav",
 }

@@ -1,4 +1,5 @@
 import random
+import time
 
 import pygame
 
@@ -30,10 +31,10 @@ from systems.time_attack import TimeAttackLevel, get_exercises as get_time_attac
 from systems.training import TrainingLevel, generate_personalized_exercises
 from systems.versus import VersusLevel, get_exercises as get_versus_exercises
 from ui import (
-    achievements_screen, exam_result_screen, free_practice_select_screen, game_screen,
-    leaderboard_screen, level_select, menu, message_screen, name_entry_screen, results_screen,
-    settings_screen, statistics_screen, survival_result_screen, time_attack_select_screen,
-    versus_result_screen,
+    achievements_screen, exam_result_screen, falling_game_screen, free_practice_select_screen,
+    game_screen, leaderboard_screen, level_select, menu, message_screen, name_entry_screen,
+    results_screen, settings_screen, statistics_screen, survival_result_screen,
+    time_attack_select_screen, versus_result_screen,
 )
 
 SCENE_MENU = "menu"
@@ -108,6 +109,7 @@ class Game:
         while self.running:
             self.clock.tick(settings.FPS)
             self._handle_events()
+            self._update_level_timing()
             self.effects.update()
             self._render()
         pygame.quit()
@@ -484,6 +486,8 @@ class Game:
             "is_exam": False,
             "is_numpad_mode": False,
             "is_versus": False,
+            "is_falling_mode": getattr(level_module, "FALLING_MODE", False),
+            "phrase_fall_start": time.perf_counter(),
         }
         self.level_session["timer"].start()
         self._change_scene(SCENE_LEVEL)
@@ -548,25 +552,66 @@ class Game:
             return
 
         if input_manager.is_complete():
-            next_index = session["exercise_index"] + 1
-            if next_index >= len(session["exercises"]) and session.get("cycle_exercises", False):
-                next_index = 0
-            if next_index < len(session["exercises"]):
-                # Un ejercicio a la vez (no todos pegados en un solo texto),
-                # para que quepa en pantalla incluso en niveles con muchas
-                # lineas de codigo. La racha de combo se conserva entre
-                # ejercicios para que se sienta continua.
-                session["completed_managers"].append(input_manager)
-                next_manager = InputManager(session["exercises"][next_index])
-                next_manager.combo = input_manager.combo
-                next_manager.max_combo = input_manager.combo
-                session["exercise_index"] = next_index
-                session["input_manager"] = next_manager
-            else:
-                self._finish_level()
+            if session.get("is_falling_mode", False) and input_manager.error_count == 0:
+                self.sound.play("phrase_complete")
+            self._advance_exercise(session, input_manager)
+
+    def _advance_exercise(self, session, input_manager):
+        """Pasa al siguiente ejercicio de la sesion (o termina el nivel si
+        era el ultimo). Se usa tanto cuando el jugador completa una frase
+        como cuando una frase que cae llega al fondo sin completarse."""
+        next_index = session["exercise_index"] + 1
+        if next_index >= len(session["exercises"]) and session.get("cycle_exercises", False):
+            next_index = 0
+        if next_index < len(session["exercises"]):
+            # Un ejercicio a la vez (no todos pegados en un solo texto),
+            # para que quepa en pantalla incluso en niveles con muchas
+            # lineas de codigo. La racha de combo se conserva entre
+            # ejercicios para que se sienta continua.
+            session["completed_managers"].append(input_manager)
+            next_manager = InputManager(session["exercises"][next_index])
+            next_manager.combo = input_manager.combo
+            next_manager.max_combo = input_manager.combo
+            session["exercise_index"] = next_index
+            session["input_manager"] = next_manager
+            if session.get("is_falling_mode", False):
+                session["phrase_fall_start"] = time.perf_counter()
+        else:
+            self._finish_level()
+
+    def _fall_duration(self, session):
+        """Segundos que tiene la frase actual para caer del techo al piso,
+        proporcional a su longitud (una oracion larga necesita mas tiempo
+        que una palabra suelta aunque sean del mismo nivel)."""
+        target_text = session["input_manager"].target_text
+        seconds_per_character = session["level_module"].SECONDS_PER_CHARACTER
+        return max(2.5, len(target_text) * seconds_per_character)
+
+    def _falling_progress(self, session):
+        """0.0 = recien aparecio arriba, 1.0 = llego al piso."""
+        elapsed_falling = time.perf_counter() - session["phrase_fall_start"]
+        return min(1.0, elapsed_falling / self._fall_duration(session))
+
+    def _update_level_timing(self):
+        """Chequeo por cuadro (no solo al presionar una tecla): detecta
+        frases que caen y llegan al fondo sin completarse, y el vencimiento
+        del temporizador general, incluso si el jugador dejo de escribir."""
+        if self.scene != SCENE_LEVEL:
+            return
+
+        session = self.level_session
+        input_manager = session["input_manager"]
+
+        if session.get("is_falling_mode", False) and not input_manager.is_complete():
+            elapsed_falling = time.perf_counter() - session["phrase_fall_start"]
+            if elapsed_falling >= self._fall_duration(session):
+                input_manager.force_miss()
+                self.sound.play("type_error")
+                self.effects.trigger("flash_error", ERROR_FLASH_DURATION_SECONDS)
+                self._advance_exercise(session, input_manager)
                 return
 
-        if session["timer"].is_expired():
+        if self.scene == SCENE_LEVEL and session["timer"].is_expired():
             self._finish_level()
 
     def _finish_versus_round(self, session, wpm, precision, error_count, max_combo, score):
@@ -753,10 +798,17 @@ class Game:
                 registry.get_all_numbers(), self.level_select_index, self.progression,
             )
         elif self.scene == SCENE_LEVEL:
-            game_screen.draw(
-                self.screen, self.font_text, self.font_hud,
-                self.level_session, self.level_session["level_module"],
-            )
+            if self.level_session.get("is_falling_mode", False):
+                falling_game_screen.draw(
+                    self.screen, self.font_text, self.font_hud,
+                    self.level_session, self.level_session["level_module"],
+                    self._falling_progress(self.level_session),
+                )
+            else:
+                game_screen.draw(
+                    self.screen, self.font_text, self.font_hud,
+                    self.level_session, self.level_session["level_module"],
+                )
         elif self.scene == SCENE_RESULTS:
             if self.last_result and self.last_result.get("is_exam"):
                 exam_result_screen.draw(self.screen, self.font_title, self.font_hud, self.last_result, self.player)
