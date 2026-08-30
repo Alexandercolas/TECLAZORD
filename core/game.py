@@ -9,6 +9,7 @@ from core.audio import SoundManager
 from core.effects import EffectManager
 from core.input_manager import InputManager
 from core.keymap import NUMPAD_KEYS, is_numpad_key
+from core.paths import get_asset_path
 from core.player import Player
 from core.progression import Progression
 from core.timer import GameTimer
@@ -76,6 +77,7 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode((settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
         pygame.display.set_caption(settings.TITLE)
+        self._set_window_icon()
         self.clock = pygame.time.Clock()
 
         self.font_text = pygame.font.SysFont(settings.FONT_NAME, settings.FONT_SIZE_TEXT)
@@ -104,6 +106,13 @@ class Game:
         self.versus_state = None
         self.free_practice_index = 0
         self.time_attack_index = 1
+
+    def _set_window_icon(self):
+        try:
+            icon = pygame.image.load(get_asset_path("icon", "logo_teclazo_rd.png"))
+            pygame.display.set_icon(icon)
+        except (pygame.error, FileNotFoundError):
+            pass  # sin icono no debe romper el juego
 
     def run(self):
         while self.running:

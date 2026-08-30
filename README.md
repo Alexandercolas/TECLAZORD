@@ -178,9 +178,13 @@ Windows de verdad (no solo un `.exe` en una carpeta):
 - [x] Fase 1 (rutas/assets/CWD) + Fase 6 (datos del jugador separados
   del programa): `core/paths.py`, ver seccion de arquitectura arriba
 - [x] Fase 4 (PyInstaller -> `.exe`): `tools/build_exe.bat`
+- [x] Fase 3: icono oficial (logo de la abeja con auriculares,
+  `assets/icon/teclazo_rd.ico` en 7 resoluciones) — se ve en el `.exe`
+  (verificado extrayendolo del binario real), en la ventana del juego,
+  y queda listo para usarse en accesos directos/Menu Inicio cuando
+  exista el instalador
 - [ ] Fase 2: reorganizar todo bajo una carpeta `app/` (reestructuracion
   grande, no bloquea nada de lo demas — pendiente de decidir si vale la pena)
-- [ ] Fase 3: icono oficial (`.ico`) para el exe/ventana/accesos directos
 - [ ] Fase 7-10: instalador real (asistente, Program Files, acceso
   directo, entrada en Menu Inicio, desinstalador con opcion de
   conservar datos)

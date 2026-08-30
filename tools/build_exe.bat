@@ -11,7 +11,7 @@ cd /d "%~dp0\.."
 python -m pip install --quiet pyinstaller
 if errorlevel 1 goto :error
 
-python -m PyInstaller --name TeclazoRD --onedir --windowed --contents-directory . --add-data "assets;assets" --noconfirm main.py
+python -m PyInstaller --name TeclazoRD --onedir --windowed --contents-directory . --icon "assets\icon\teclazo_rd.ico" --add-data "assets;assets" --noconfirm main.py
 if errorlevel 1 goto :error
 
 echo.
