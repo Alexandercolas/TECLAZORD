@@ -1,6 +1,9 @@
+import os
+
 import pygame
 
 from config import settings
+from core.paths import get_base_dir
 
 
 class SoundManager:
@@ -18,9 +21,9 @@ class SoundManager:
             self.device_available = False
             return
 
-        for name, path in settings.SOUND_FILES.items():
+        for name, relative_path in settings.SOUND_FILES.items():
             try:
-                sound = pygame.mixer.Sound(path)
+                sound = pygame.mixer.Sound(os.path.join(get_base_dir(), relative_path))
                 sound.set_volume(settings.SOUND_VOLUME)
                 self.sounds[name] = sound
             except (pygame.error, FileNotFoundError):

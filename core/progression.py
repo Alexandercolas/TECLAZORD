@@ -1,12 +1,11 @@
 from config.settings import LEVEL_UNLOCK_SCORE
+from core.paths import get_user_data_path
 from systems.save_manager import load_json, save_json
-
-DEFAULT_PROGRESS_PATH = "data/progress.json"
 
 
 class Progression:
     def __init__(self, path=None):
-        self.path = path or DEFAULT_PROGRESS_PATH
+        self.path = path or get_user_data_path("progress.json")
         self.data = load_json(self.path, default={"unlocked_levels": [1], "level_records": {}})
 
     def is_unlocked(self, level_number):

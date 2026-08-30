@@ -1,11 +1,10 @@
+from core.paths import get_user_data_path
 from systems.save_manager import load_json, save_json
-
-DEFAULT_SETTINGS_PATH = "data/settings.json"
 
 
 class GameSettings:
     def __init__(self, path=None):
-        self.path = path or DEFAULT_SETTINGS_PATH
+        self.path = path or get_user_data_path("settings.json")
         self.data = load_json(self.path, default={"sound_enabled": True, "volume": 0.5})
 
     def set_volume(self, volume):

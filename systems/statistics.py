@@ -1,6 +1,5 @@
+from core.paths import get_user_data_path
 from systems.save_manager import load_json, save_json
-
-DEFAULT_STATISTICS_PATH = "data/statistics.json"
 
 
 def _default_stats():
@@ -20,7 +19,7 @@ def _default_stats():
 
 class Statistics:
     def __init__(self, path=None):
-        self.path = path or DEFAULT_STATISTICS_PATH
+        self.path = path or get_user_data_path("statistics.json")
         self.data = load_json(self.path, default=_default_stats())
 
     def register_level_result(self, result, elapsed_seconds):

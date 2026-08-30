@@ -94,9 +94,36 @@ tools\build_exe.bat
 Genera `dist\TeclazoRD\TeclazoRD.exe`. **Comprime toda la carpeta**
 `dist\TeclazoRD` (no solo el .exe) y comparte el .zip — el ejecutable
 necesita los archivos de al lado (assets de sonido, dependencias de
-Python empaquetadas) para funcionar. Cada persona que lo use genera su
-propia carpeta `data/` junto al .exe con su progreso, nombre y
-estadisticas; no se comparte entre instalaciones.
+Python empaquetadas) para funcionar.
+
+El progreso de cada persona **no** se guarda junto al `.exe` — se
+guarda en `%LOCALAPPDATA%\TeclazoRD\` (ver seccion de arquitectura mas
+abajo). Esto es a proposito: si algun dia el juego se instala en
+`C:\Program Files\`, esa carpeta normalmente no se puede escribir sin
+permisos de administrador, y ahi es exactamente donde NO debe vivir el
+progreso del jugador.
+
+## Arquitectura: rutas y datos del jugador
+
+`core/paths.py` es el unico lugar que decide donde viven las cosas — el
+resto del codigo nunca asume su propio directorio de trabajo (ni para
+cargar assets, ni para guardar progreso):
+
+- **Corriendo desde codigo fuente** (`python main.py`): igual que
+  siempre, todo se guarda en `data/` dentro del proyecto.
+- **Empaquetado** (`.exe` generado con PyInstaller): el progreso se
+  guarda en `%LOCALAPPDATA%\TeclazoRD\` (Windows) o
+  `~/.local/share/TeclazoRD` (otros SO) — nunca junto al `.exe` ni
+  dentro de la carpeta de instalacion. Los assets (sonidos) se resuelven
+  contra la carpeta del propio ejecutable, no contra el directorio
+  desde el que se lo haya lanzado (un acceso directo con un "Iniciar
+  en" distinto no rompe nada).
+
+Esto es preparacion explicita para una futura instalacion en
+`C:\Program Files\`, donde escribir junto al programa normalmente
+requiere permisos de administrador — y es justo donde el progreso del
+jugador NO debe vivir, para que una actualizacion o reinstalacion no lo
+borre.
 
 ## Ejecutar las pruebas
 
@@ -109,11 +136,12 @@ pytest
 ```
 main.py            Punto de entrada
 config/settings.py Configuracion (colores, ventana, formula de puntuacion)
+core/paths.py       Resuelve rutas de assets y datos (ver seccion de arquitectura)
 core/               Motor: timer, entrada de texto, puntuacion, progreso
 levels/             Definicion de cada nivel (ejercicios, tiempo limite)
 systems/            Persistencia en JSON
 ui/                 Pantallas (menu, partida, resultados)
-data/               Progreso guardado del jugador (JSON, no versionado)
+data/               Progreso del jugador SOLO en modo desarrollo (ver arquitectura)
 tests/              Pruebas de la logica pura (sin Pygame)
 assets/sounds/      Efectos de sonido (.wav, generados con tools/generate_sounds.py)
 tools/              Herramientas de desarrollo (no se ejecutan en el juego)
@@ -141,3 +169,26 @@ python tools/generate_sounds.py
 - [x] Modo Aleatorio: elige al azar entre un nivel desbloqueado o cualquier modo especial (reutiliza los metodos existentes, sin logica nueva)
 - [x] Orden aleatorio de ejercicios en Practica Libre y Modo Numpad (decision del usuario: la campana de 10 niveles mantiene su orden fijo a proposito, para no romper la rampa de dificultad "empezar facil, terminar dificil" que pide el documento dentro de cada nivel)
 - [ ] Fuera de alcance por ahora: temas visuales alternativos (el usuario confirmo que el esquema amarillo/negro actual esta bien), Modo oficina y Modo programacion multi-lenguaje como modos separados (ya cubiertos por las categorias existentes de Practica Libre y por el Nivel 8/5/7, pero sin JavaScript/SQL/HTML como pide la seccion 27)
+
+## Roadmap de instalador (aparte del documento maestro)
+
+Preparacion para convertir TECLAZO RD en una aplicacion instalable de
+Windows de verdad (no solo un `.exe` en una carpeta):
+
+- [x] Fase 1 (rutas/assets/CWD) + Fase 6 (datos del jugador separados
+  del programa): `core/paths.py`, ver seccion de arquitectura arriba
+- [x] Fase 4 (PyInstaller -> `.exe`): `tools/build_exe.bat`
+- [ ] Fase 2: reorganizar todo bajo una carpeta `app/` (reestructuracion
+  grande, no bloquea nada de lo demas — pendiente de decidir si vale la pena)
+- [ ] Fase 3: icono oficial (`.ico`) para el exe/ventana/accesos directos
+- [ ] Fase 7-10: instalador real (asistente, Program Files, acceso
+  directo, entrada en Menu Inicio, desinstalador con opcion de
+  conservar datos)
+- [ ] Fase 11-12: metadata de Windows en el exe (version, editor,
+  descripcion) y numero de version (`v0.1.0` etc.)
+- [ ] Fase 14-16: prueba de que una actualizacion no borra el progreso,
+  build automatico (tests -> build -> instalador), carpeta `release/`
+
+Decision explicita: no se construye el instalador todavia. Se
+resolvieron primero las decisiones de arquitectura (Fase 1 y 6) porque
+son caras de cambiar despues; el resto se retoma cuando se pida.

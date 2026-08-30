@@ -1,6 +1,5 @@
+from core.paths import get_user_data_path
 from systems.save_manager import load_json, save_json
-
-DEFAULT_LEADERBOARD_PATH = "data/leaderboard.json"
 
 
 class Leaderboard:
@@ -9,7 +8,7 @@ class Leaderboard:
     completo."""
 
     def __init__(self, path=None):
-        self.path = path or DEFAULT_LEADERBOARD_PATH
+        self.path = path or get_user_data_path("leaderboard.json")
         self.data = load_json(self.path, default={"entries": {}})
 
     def register_run(self, name, wpm, precision, level_number, score):

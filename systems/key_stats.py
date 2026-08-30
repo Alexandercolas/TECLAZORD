@@ -1,6 +1,5 @@
+from core.paths import get_user_data_path
 from systems.save_manager import load_json, save_json
-
-DEFAULT_KEY_STATS_PATH = "data/key_stats.json"
 
 
 class KeyStats:
@@ -8,7 +7,7 @@ class KeyStats:
     las sesiones (seccion 14 y 15 del documento maestro)."""
 
     def __init__(self, path=None):
-        self.path = path or DEFAULT_KEY_STATS_PATH
+        self.path = path or get_user_data_path("key_stats.json")
         self.data = load_json(self.path, default={"error_counts": {}})
 
     def register_errors(self, character_errors):

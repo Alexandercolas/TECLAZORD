@@ -1,6 +1,5 @@
+from core.paths import get_user_data_path
 from systems.save_manager import load_json, save_json
-
-DEFAULT_ACHIEVEMENTS_PATH = "data/achievements.json"
 
 ACHIEVEMENT_DEFINITIONS = [
     {"id": "primer_nivel", "name": "Primer Tecleo", "description": "Completa tu primer nivel."},
@@ -14,7 +13,7 @@ ACHIEVEMENT_DEFINITIONS = [
 
 class Achievements:
     def __init__(self, path=None):
-        self.path = path or DEFAULT_ACHIEVEMENTS_PATH
+        self.path = path or get_user_data_path("achievements.json")
         self.data = load_json(self.path, default={"unlocked": []})
 
     def is_unlocked(self, achievement_id):
