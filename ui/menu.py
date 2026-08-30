@@ -1,4 +1,5 @@
 from config import settings
+from core.version import VERSION
 
 
 def draw(screen, font_title, font_hud):
@@ -6,6 +7,9 @@ def draw(screen, font_title, font_hud):
 
     title_surf = font_title.render("TECLAZO RD", True, settings.COLORS["accent"])
     screen.blit(title_surf, title_surf.get_rect(center=(width // 2, height // 3)))
+
+    version_surf = font_hud.render(f"v{VERSION}", True, settings.COLORS["text_pending"])
+    screen.blit(version_surf, version_surf.get_rect(bottomright=(width - 16, height - 12)))
 
     hint_lines = [
         "ENTER elegir nivel  -  E estadisticas  -  L logros  -  R leaderboard  -  A aleatorio",

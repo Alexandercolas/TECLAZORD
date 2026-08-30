@@ -13,7 +13,9 @@ adicionales** (Practica libre, Modo Errores, Modo Examen, Modo Numpad,
 Modo Versus, Contrarreloj, Supervivencia, Leaderboard, Estadisticas,
 Logros), con desbloqueo progresivo, teclado visual, XP, sonido, efectos
 y configuracion (Fases 1-6 del documento maestro completas, mas la
-seccion 16 de modos de juego y la seccion 27 de expansiones).
+seccion 16 de modos de juego y la seccion 27 de expansiones). Version
+**1.0.0**, con instalador real de Windows (icono oficial, entrada en
+Menu Inicio, desinstalador) — ver "Roadmap de instalador" mas abajo.
 
 ## Requisitos
 
@@ -85,7 +87,12 @@ distinto del clic de cada tecla.
 
 ## Compartirlo con otros (ejecutable de Windows)
 
-Para que alguien lo juegue sin instalar Python ni nada:
+**Recomendado:** `tools\build_app.bat` genera un instalador real —
+ver "Como generar el instalador" mas abajo. Quien lo reciba solo
+necesita ejecutar `TECLAZO_RD_Setup_v1.0.0.exe`, sin Python, sin
+carpetas que comprimir ni descomprimir.
+
+Alternativa mas simple (sin instalador, una carpeta suelta):
 
 ```bash
 tools\build_exe.bat
@@ -179,20 +186,52 @@ Windows de verdad (no solo un `.exe` en una carpeta):
   del programa): `core/paths.py`, ver seccion de arquitectura arriba
 - [x] Fase 4 (PyInstaller -> `.exe`): `tools/build_exe.bat`
 - [x] Fase 3: icono oficial (logo de la abeja con auriculares,
-  `assets/icon/teclazo_rd.ico` en 7 resoluciones) — se ve en el `.exe`
-  (verificado extrayendolo del binario real), en la ventana del juego,
-  y queda listo para usarse en accesos directos/Menu Inicio cuando
-  exista el instalador
+  `assets/icon/teclazo_rd.ico` en 7 resoluciones) — se ve en el `.exe`,
+  en el instalador, y en la ventana del juego (verificado extrayendo
+  el icono real de ambos binarios compilados)
+- [x] Fase 7-10: instalador real con Inno Setup
+  (`installer/teclazo_rd.iss`) — asistente en espanol, elige carpeta
+  de instalacion, checkbox de acceso directo en escritorio, entrada en
+  Menu Inicio, y desinstalador registrado en
+  "Aplicaciones instaladas" de Windows. Al desinstalar de forma
+  interactiva, pregunta si conservar o borrar el progreso; en una
+  desinstalacion silenciosa (`/VERYSILENT`, la que usaria un
+  actualizador) NO pregunta y conserva los datos por defecto, para no
+  quedar esperando una respuesta que nunca llega.
+- [x] Fase 11: metadata de Windows en el `.exe`
+  (`tools/version_info.txt`) — Propiedades del archivo muestra
+  "TECLAZO RD", no "python.exe"
+- [x] Fase 12: version centralizada en `core/version.py` (arranca en
+  `1.0.0`: con 20 niveles + 10 modos de juego ya cumple el criterio de
+  "primera version estable" del propio roadmap, no `0.1.0`)
+- [x] Fase 14: verificado que el progreso sobrevive una
+  reinstalacion/actualizacion (los datos viven en
+  `%LOCALAPPDATA%\TeclazoRD`, fuera de la carpeta que el instalador
+  sobrescribe)
+- [x] Fase 15: `tools/build_app.bat` corre pruebas -> genera el `.exe`
+  -> compila el instalador, y no genera nada si los tests fallan
+- [x] Fase 16: el instalador final queda en `release\TECLAZO_RD_Setup_v1.0.0.exe`
 - [ ] Fase 2: reorganizar todo bajo una carpeta `app/` (reestructuracion
-  grande, no bloquea nada de lo demas — pendiente de decidir si vale la pena)
-- [ ] Fase 7-10: instalador real (asistente, Program Files, acceso
-  directo, entrada en Menu Inicio, desinstalador con opcion de
-  conservar datos)
-- [ ] Fase 11-12: metadata de Windows en el exe (version, editor,
-  descripcion) y numero de version (`v0.1.0` etc.)
-- [ ] Fase 14-16: prueba de que una actualizacion no borra el progreso,
-  build automatico (tests -> build -> instalador), carpeta `release/`
+  grande y de puro orden interno, sin beneficio funcional — evaluada y
+  descartada por ahora; se retoma si el proyecto crece mucho mas)
 
-Decision explicita: no se construye el instalador todavia. Se
-resolvieron primero las decisiones de arquitectura (Fase 1 y 6) porque
-son caras de cambiar despues; el resto se retoma cuando se pida.
+### Como generar el instalador
+
+Requiere [Inno Setup](https://jrsoftware.org/isinfo.php) (`winget install
+--id JRSoftware.InnoSetup -e`), ademas de lo que ya pide `build_exe.bat`:
+
+```bash
+tools\build_app.bat
+```
+
+Genera `release\TECLAZO_RD_Setup_v1.0.0.exe` — ese es el unico archivo
+que se le entrega a otra persona para instalar TECLAZO RD (no hace
+falta enviar la carpeta `dist\` ni el `.zip` manual). `release/` no se
+versiona en git (es un artefacto generado, igual que `dist/`).
+
+Verificado con una instalacion y desinstalacion reales (silenciosas,
+via linea de comandos) en esta misma maquina: copia los archivos
+correctos, crea la entrada de Menu Inicio, registra el desinstalador
+en Windows, el juego arranca desde la ruta instalada, y al desinstalar
+el progreso del jugador (en `%LOCALAPPDATA%\TeclazoRD`) sobrevive
+intacto.
