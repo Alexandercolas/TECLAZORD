@@ -34,7 +34,7 @@ def draw(screen, font_title, font_hud, level_numbers, selected_index, progressio
         if not unlocked:
             label += "  (bloqueado)"
         elif record:
-            label += f"  -  mejor puntuacion: {int(record['best_score'])}"
+            label += f"  -  mejor puntuacion: {int(record.get('best_score', 0))}"
 
         color = settings.COLORS["text"] if unlocked else settings.COLORS["text_pending"]
         if i == selected_index:

@@ -14,7 +14,7 @@ class Progression:
     def register_result(self, level_number, score, wpm, precision, elapsed_seconds, max_combo):
         record = self.data["level_records"].setdefault(str(level_number), {})
 
-        if score > record.get("best_score", 0):
+        if "best_score" not in record or score > record["best_score"]:
             record["best_score"] = score
             record["best_wpm"] = wpm
             record["best_precision"] = precision
