@@ -14,8 +14,11 @@ Modo Versus, Contrarreloj, Supervivencia, Leaderboard, Estadisticas,
 Logros), con desbloqueo progresivo, teclado visual, XP, sonido, efectos
 y configuracion (Fases 1-6 del documento maestro completas, mas la
 seccion 16 de modos de juego y la seccion 27 de expansiones). Version
-**1.0.0**, con instalador real de Windows (icono oficial, entrada en
+**1.0.1**, con instalador real de Windows (icono oficial, entrada en
 Menu Inicio, desinstalador) — ver "Roadmap de instalador" mas abajo.
+
+**Descargar:** [ultima version en Releases](https://github.com/Alexandercolas/TECLAZORD/releases/latest)
+(no requiere Python).
 
 ## Requisitos
 
@@ -224,10 +227,23 @@ Requiere [Inno Setup](https://jrsoftware.org/isinfo.php) (`winget install
 tools\build_app.bat
 ```
 
-Genera `release\TECLAZO_RD_Setup_v1.0.0.exe` — ese es el unico archivo
+Genera `release\TECLAZO_RD_Setup_vX.X.X.exe` — ese es el unico archivo
 que se le entrega a otra persona para instalar TECLAZO RD (no hace
 falta enviar la carpeta `dist\` ni el `.zip` manual). `release/` no se
-versiona en git (es un artefacto generado, igual que `dist/`).
+versiona en git (es un artefacto generado, igual que `dist/`): en vez
+de eso, cada version se publica como
+[GitHub Release](https://github.com/Alexandercolas/TECLAZORD/releases)
+con el instalador adjunto, por ejemplo:
+
+```bash
+git tag -a v1.0.1 -m "TECLAZO RD v1.0.1 - descripcion del cambio"
+git push origin v1.0.1
+gh release create v1.0.1 "release/TECLAZO_RD_Setup_v1.0.1.exe" --title "TECLAZO RD v1.0.1" --notes "..."
+```
+
+No olvidar subir `core/version.py`, `tools/version_info.txt` y el
+`#define MyAppVersion` de `installer/teclazo_rd.iss` juntos antes de
+generar el build (no se sincronizan solos).
 
 Verificado con una instalacion y desinstalacion reales (silenciosas,
 via linea de comandos) en esta misma maquina: copia los archivos
