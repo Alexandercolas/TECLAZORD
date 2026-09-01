@@ -8,7 +8,7 @@
 ; Requiere que ya exista dist\TeclazoRD\ (generado con tools\build_exe.bat).
 
 #define MyAppName "TECLAZO RD"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "TECLAZO RD"
 #define MyAppURL "https://github.com/Alexandercolas/TECLAZORD"
 #define MyAppExeName "TeclazoRD.exe"

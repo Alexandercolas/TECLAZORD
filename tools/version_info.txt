@@ -7,8 +7,8 @@
 # (aqui van 4 numeros; el 4to queda en 0 si no se usa).
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 0, 0, 0),
-    prodvers=(1, 0, 0, 0),
+    filevers=(1, 0, 1, 0),
+    prodvers=(1, 0, 1, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -24,12 +24,12 @@ VSVersionInfo(
           [
             StringStruct(u"CompanyName", u"TECLAZO RD"),
             StringStruct(u"FileDescription", u"TECLAZO RD - Entrenamiento de mecanografia"),
-            StringStruct(u"FileVersion", u"1.0.0.0"),
+            StringStruct(u"FileVersion", u"1.0.1.0"),
             StringStruct(u"InternalName", u"TeclazoRD"),
             StringStruct(u"LegalCopyright", u"TECLAZO RD"),
             StringStruct(u"OriginalFilename", u"TeclazoRD.exe"),
             StringStruct(u"ProductName", u"TECLAZO RD"),
-            StringStruct(u"ProductVersion", u"1.0.0.0"),
+            StringStruct(u"ProductVersion", u"1.0.1.0"),
           ],
         )
       ]
